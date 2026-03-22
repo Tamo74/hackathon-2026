@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block title %}
+
+{% endblock %}
+{% block main %}
+
+<div class="container mt-5">
+
+  <h2 class="text-center mb-4">Find Jobs</h2>
+
+  <form action="/job" method="post" class="mb-5">
+
+    <input type="text" name="what" class="form-control mb-3" placeholder="Job title (e.g. engineer)">
+
+    <select name="where" class="form-select mb-3">
+      <option value="New York">New York</option>
+      <option value="Austin">Austin</option>
+      <option value="Los Angeles">Los Angeles</option>
+      <option value="Atlanta">Atlanta</option>
+    </select>
+
+    <select name="contract_type" class="form-select mb-3">
+      <option value="">Any</option>
+      <option value="full_time">Full Time</option>
+      <option value="part_time">Part Time</option>
+    </select>
+
+    <button class="btn btn-primary w-100">Search Jobs</button>
+
+  </form>
+
+  <div class="row">
+
+    {% for job in jobs %}
+      <div class="col-md-4 mb-4">
+        <div class="card shadow p-3">
+          <h5>{{ job.title }}</h5>
+          <p>{{ job.location.display_name }}</p>
+          <p class="text-success fw-bold">
+            ${{ job.salary_min }} - ${{ job.salary_max }}
+          </p>
+          <a href="{{ job.redirect_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+            View Job
+          </a>
+        </div>
+      </div>
+
+
+{% endblock %}
