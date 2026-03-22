@@ -1,67 +1,185 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Accessibility Settings</title>
-    <script src="{{ url_for('static', filename='accessibility.js') }}" defer></script>
-
-    <style>
-        body { font-family: Arial; padding: 20px; }
-        .section { border-bottom: 1px solid #ddd; padding: 15px 0; cursor: pointer; }
-        .section-title { font-size: 20px; font-weight: bold; }
-        .content { display: none; margin-top: 10px; }
-        .slider { width: 100%; }
-        .toggle { margin: 10px 0; display: flex; align-items: center; gap: 10px; }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Accessibility Settings</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+  <script src="{{ url_for('static', filename='accessibility.js') }}" defer></script>
+  <style>
+    body { font-size: {{ settings.text_size if settings else 16 }}px; }
+  </style>
 </head>
 <body>
 
-<h1>Accessibility Settings</h1>
+<nav class="topnav">
+  <span class="topnav-brand">My<span>App</span></span>
+  <div class="topnav-links">
+    <a href="{{ url_for('index') }}">Dashboard</a>
+    <a href="{{ url_for('logout') }}">Log out</a>
+  </div>
+</nav>
 
-<div class="section" onclick="toggleSection('accessibility')">
-    <div class="section-title">Accessibility Options</div>
-    <div id="accessibility" class="content">
+<div class="settings-page">
 
-        <label>Text Size</label>
-        <input id="textSize" type="range" min="10" max="30" class="slider"
-               value="{{ settings.text_size }}"><br><br>
+  <div class="settings-header">
+    <h1>Accessibility</h1>
+    <p>Customise the interface to suit your needs. Changes are saved to your account.</p>
+  </div>
 
-        <label>Icon Size</label>
-        <input id="iconSize" type="range" min="16" max="48" class="slider"
-               value="{{ settings.icon_size }}"><br><br>
+  <!-- Display -->
+  <div class="settings-card">
+    <div class="section-title">Display</div>
 
-        <div class="toggle">
-            <input id="tts" type="checkbox" {% if settings.tts %}checked{% endif %}>
-            <label>Enable Text-to-Speech</label>
-        </div>
-
-        <div class="toggle">
-            <input id="autoscroll" type="checkbox" {% if settings.autoscroll %}checked{% endif %}>
-            <label>Enable Auto-scroll</label>
-        </div>
-
-        <div class="toggle">
-            <input id="darkMode" type="checkbox" {% if settings.dark_mode %}checked{% endif %}>
-            <label>Enable Dark Mode</label>
-        </div>
-
-        <label>Colour Filter</label>
-        <select id="colourFilter">
-            <option value="none" {% if settings.colour_filter=='none' %}selected{% endif %}>None</option>
-            <option value="protanopia" {% if settings.colour_filter=='protanopia' %}selected{% endif %}>Protanopia</option>
-            <option value="deuteranopia" {% if settings.colour_filter=='deuteranopia' %}selected{% endif %}>Deuteranopia</option>
-            <option value="tritanopia" {% if settings.colour_filter=='tritanopia' %}selected{% endif %}>Tritanopia</option>
-        </select><br><br>
-
-        <label>Language</label>
-        <select id="language">
-            <option {% if settings.language=='English' %}selected{% endif %}>English</option>
-            <option {% if settings.language=='Spanish' %}selected{% endif %}>Spanish</option>
-            <option {% if settings.language=='French' %}selected{% endif %}>French</option>
-            <option {% if settings.language=='German' %}selected{% endif %}>German</option>
-        </select><br><br>
-
-        <button onclick="saveAccessibility()">Save</button>
+    <div class="range-row">
+      <div class="range-header">
+        <strong>Text Size</strong>
+        <span class="range-value" id="textSizeVal">{{ settings.text_size if settings else 16 }}</span>
+      </div>
+      <input type="range" id="textSize" min="10" max="30"
+             value="{{ settings.text_size if settings else 16 }}"
+             oninput="document.getElementById('textSizeVal').textContent = this.value"/>
     </div>
+
+    <div class="range-row">
+      <div class="range-header">
+        <strong>Icon Size</strong>
+        <span class="range-value" id="iconSizeVal">{{ settings.icon_size if settings else 24 }}</span>
+      </div>
+      <input type="range" id="iconSize" min="16" max="48"
+             value="{{ settings.icon_size if settings else 24 }}"
+             oninput="document.getElementById('iconSizeVal').textContent = this.value"/>
+    </div>
+
+    <div class="range-row">
+      <div class="range-header"><strong>Colour Filter</strong></div>
+      <div class="field" style="margin-bottom:0; margin-top:0.5rem;">
+        <select id="colourFilter">
+          <option value="none"         {% if settings and settings.colour_filter == 'none'         %}selected{% endif %}>None</option>
+          <option value="protanopia"   {% if settings and settings.colour_filter == 'protanopia'   %}selected{% endif %}>Protanopia</option>
+          <option value="deuteranopia" {% if settings and settings.colour_filter == 'deuteranopia' %}selected{% endif %}>Deuteranopia</option>
+          <option value="tritanopia"   {% if settings and settings.colour_filter == 'tritanopia'   %}selected{% endif %}>Tritanopia</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Behaviour -->
+  <div class="settings-card">
+    <div class="section-title">Behaviour</div>
+
+    <div class="toggle-row">
+      <div class="toggle-label">
+        <strong>Auto-scroll</strong>
+        <small>Automatically scroll through long content</small>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="autoscroll" {% if settings and settings.autoscroll %}checked{% endif %}/>
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <div class="toggle-label">
+        <strong>Dark Mode</strong>
+        <small>Use the dark colour scheme</small>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="darkMode" {% if settings and settings.dark_mode %}checked{% endif %}/>
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Text to Speech -->
+  <div class="settings-card">
+    <div class="section-title">Text to Speech</div>
+
+    <div class="toggle-row">
+      <div class="toggle-label">
+        <strong>Enable TTS</strong>
+        <small>Read page content and labels aloud</small>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="tts"
+               {% if settings and settings.tts %}checked{% endif %}
+               onchange="toggleTTSSection(this)"/>
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
+    <!-- TTS options — shown only when TTS is enabled -->
+    <div id="ttsOptions" {% if not settings or not settings.tts %}class="hidden"{% endif %}>
+
+      <div class="range-row" style="margin-top:0.75rem;">
+        <div class="range-header">
+          <strong>Voice</strong>
+        </div>
+        <div class="field" style="margin-bottom:0; margin-top:0.5rem;">
+          <select id="ttsVoice" onchange="updateVoice(this)">
+            <option>Loading voices…</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="range-row">
+        <div class="range-header">
+          <strong>Speed</strong>
+          <span class="range-value" id="ttsRateVal">1.0×</span>
+        </div>
+        <input type="range" id="ttsRate" min="0.5" max="2" step="0.1" value="1"
+               oninput="document.getElementById('ttsRateVal').textContent = parseFloat(this.value).toFixed(1) + '×'"/>
+      </div>
+
+      <div class="range-row">
+        <div class="range-header">
+          <strong>Pitch</strong>
+          <span class="range-value" id="ttsPitchVal">1.0</span>
+        </div>
+        <input type="range" id="ttsPitch" min="0.5" max="2" step="0.1" value="1"
+               oninput="document.getElementById('ttsPitchVal').textContent = parseFloat(this.value).toFixed(1)"/>
+      </div>
+
+      <div class="tts-preview">
+        <button class="tts-play-btn" id="ttsPlayBtn" onclick="previewTTS()" aria-label="Preview TTS">
+          <svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
+        </button>
+        <div>
+          <div class="tts-waves" id="ttsWaves">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <p class="tts-preview-text" id="ttsPreviewText">
+            "The quick brown fox jumps over the lazy dog."
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Language -->
+  <div class="settings-card">
+    <div class="section-title">Language</div>
+    <div class="field" style="margin-bottom:0;">
+      <label for="language">Interface Language</label>
+      <select id="language">
+        <option value="English" {% if settings and settings.language == 'English' %}selected{% endif %}>English</option>
+        <option value="Spanish" {% if settings and settings.language == 'Spanish' %}selected{% endif %}>Spanish</option>
+        <option value="French"  {% if settings and settings.language == 'French'  %}selected{% endif %}>French</option>
+        <option value="German"  {% if settings and settings.language == 'German'  %}selected{% endif %}>German</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="btn btn-full" onclick="saveAccessibility()">
+    <span>Save Settings</span>
+  </button>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <div class="toast-dot"></div>
+  <span id="toastMsg"></span>
 </div>
 
 </body>

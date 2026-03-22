@@ -4,6 +4,8 @@ import re
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import os
+import sys
+print("RUNNING:", sys.argv)
 
 load_dotenv()
 
@@ -73,8 +75,8 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        confirm = request.form['confirm']
-        email = request.form['email']
+        confirm  = request.form['confirm']
+        email    = request.form['email']
 
         db = get_db()
         cursor = db.cursor(dictionary=True)
@@ -128,9 +130,9 @@ def accessibility_settings():
 @app.route('/settings/accessibility/update', methods=['POST'])
 def update_accessibility():
     if 'loggedin' not in session:
-        return redirect(url_for('login'))
+        return {"status": "error", "message": "Not logged in"}, 401
 
-    data = request.json
+    data = request.get_json()
 
     db = get_db()
     cursor = db.cursor()
@@ -141,22 +143,40 @@ def update_accessibility():
             dark_mode=%s, colour_filter=%s, language=%s
         WHERE user_id=%s
     """, (
-        data['text_size'],
-        data['icon_size'],
-        data['tts'],
-        data['autoscroll'],
-        data['dark_mode'],
-        data['colour_filter'],
-        data['language'],
+        data.get('text_size'),
+        data.get('icon_size'),
+        data.get('tts'),
+        data.get('autoscroll'),
+        data.get('dark_mode'),
+        data.get('colour_filter'),
+        data.get('language'),
         session['id']
     ))
 
     db.commit()
-    return {"status": "ok"}
+    return {"status": "ok"}  # ✅ FIXED: was unreachable (buried inside inject_settings)
+
 
 # -------------------------
-# SERVER START (LAST LINE)
-from waitress import serve
+# CONTEXT PROCESSOR
+# -------------------------
+@app.context_processor
+def inject_settings():
+    if 'loggedin' in session:
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT * FROM accessibility WHERE user_id = %s",
+            (session['id'],)
+        )
+        settings = cursor.fetchone()
+        return dict(user_settings=settings)
 
+    return dict(user_settings=None)
+
+
+# -------------------------
+# SERVER START
+# -------------------------
 if __name__ == "__main__":
-    serve(app, host="0.0.0.0", port=8080)
+    app.run(debug=True, host="0.0.0.0", port=8080)
