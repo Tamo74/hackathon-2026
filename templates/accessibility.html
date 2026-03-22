@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Accessibility Settings</title>
+    <script src="{{ url_for('static', filename='accessibility.js') }}" defer></script>
+
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .section { border-bottom: 1px solid #ddd; padding: 15px 0; cursor: pointer; }
+        .section-title { font-size: 20px; font-weight: bold; }
+        .content { display: none; margin-top: 10px; }
+        .slider { width: 100%; }
+        .toggle { margin: 10px 0; display: flex; align-items: center; gap: 10px; }
+    </style>
+</head>
+<body>
+
+<h1>Accessibility Settings</h1>
+
+<div class="section" onclick="toggleSection('accessibility')">
+    <div class="section-title">Accessibility Options</div>
+    <div id="accessibility" class="content">
+
+        <label>Text Size</label>
+        <input id="textSize" type="range" min="10" max="30" class="slider"
+               value="{{ settings.text_size }}"><br><br>
+
+        <label>Icon Size</label>
+        <input id="iconSize" type="range" min="16" max="48" class="slider"
+               value="{{ settings.icon_size }}"><br><br>
+
+        <div class="toggle">
+            <input id="tts" type="checkbox" {% if settings.tts %}checked{% endif %}>
+            <label>Enable Text-to-Speech</label>
+        </div>
+
+        <div class="toggle">
+            <input id="autoscroll" type="checkbox" {% if settings.autoscroll %}checked{% endif %}>
+            <label>Enable Auto-scroll</label>
+        </div>
+
+        <div class="toggle">
+            <input id="darkMode" type="checkbox" {% if settings.dark_mode %}checked{% endif %}>
+            <label>Enable Dark Mode</label>
+        </div>
+
+        <label>Colour Filter</label>
+        <select id="colourFilter">
+            <option value="none" {% if settings.colour_filter=='none' %}selected{% endif %}>None</option>
+            <option value="protanopia" {% if settings.colour_filter=='protanopia' %}selected{% endif %}>Protanopia</option>
+            <option value="deuteranopia" {% if settings.colour_filter=='deuteranopia' %}selected{% endif %}>Deuteranopia</option>
+            <option value="tritanopia" {% if settings.colour_filter=='tritanopia' %}selected{% endif %}>Tritanopia</option>
+        </select><br><br>
+
+        <label>Language</label>
+        <select id="language">
+            <option {% if settings.language=='English' %}selected{% endif %}>English</option>
+            <option {% if settings.language=='Spanish' %}selected{% endif %}>Spanish</option>
+            <option {% if settings.language=='French' %}selected{% endif %}>French</option>
+            <option {% if settings.language=='German' %}selected{% endif %}>German</option>
+        </select><br><br>
+
+        <button onclick="saveAccessibility()">Save</button>
+    </div>
+</div>
+
+</body>
+</html>
