@@ -7,3 +7,53 @@
 
 
 {% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+  <style>
+    body {
+      font-size: {{ user_settings.text_size if user_settings else 16 }}px;
+    }
+    {% if user_settings and user_settings.dark_mode %}
+    /* dark mode already is the default theme — no override needed */
+    {% endif %}
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <span class="topnav-brand">My<span>App</span></span>
+  <div class="topnav-links">
+    <a href="{{ url_for('accessibility_settings') }}">Accessibility</a>
+    <a href="{{ url_for('logout') }}">Log out</a>
+  </div>
+</nav>
+
+<div class="dashboard-page">
+  <div class="welcome-block">
+    <h1>Welcome, <span>{{ username }}</span>!</h1>
+    <p>You're logged in. Here's your dashboard.</p>
+  </div>
+
+  <div class="dash-grid">
+    <a href="{{ url_for('accessibility_settings') }}" class="dash-card">
+      <div class="dash-card-title">Accessibility</div>
+      <div class="dash-card-desc">Adjust text size, colour filters, TTS, and more.</div>
+    </a>
+    <div class="dash-card">
+      <div class="dash-card-title">Profile</div>
+      <div class="dash-card-desc">Update your username, email, and password.</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-title">Activity</div>
+      <div class="dash-card-desc">View your recent sessions and history.</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
